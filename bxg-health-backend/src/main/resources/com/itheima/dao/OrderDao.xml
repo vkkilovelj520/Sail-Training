@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.OrderDao">
+
+
+    <select id="pageQuery" resultType="com.itheima.vo.OrderVO">
+        SELECT o.id,
+        o.orderDate,
+        m.fileNumber as fileNumber,
+        m.name as name,
+        m.phoneNumber AS phoneNumber,
+        o.orderType,
+        o.orderStatus
+        FROM t_order o
+        LEFT JOIN t_member m ON o.member_id = m.id
+        <where>
+            <if test="name != null and name != ' '">
+                m.name like concat('%',?,'%')
+            </if>
+        </where>
+        ORDER BY o.orderDate DESC
+    </select>
+
+    <update id="edit" parameterType="com.itheima.pojo.Order">
+        update t_order
+        <set>
+            <if test="orderDate != null">
+                orderDate = #{orderDate},
+            </if>
+            <if test="orderType != null">
+                orderType = #{orderType},
+            </if>
+            <if test="orderStatus != null">
+                orderStatus = #{orderStatus},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findOrderCountByDate" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM t_order WHERE orderDate = #{orderDate}
+    </select>
+    <select id="findOrderCountAfterDate" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM t_order WHERE orderDate &gt;= #{orderDate}
+    </select>
+    <select id="findVisitsCountByDate" resultType="java.lang.Integer">
+        select count(id) from t_order where orderDate = #{orderDate} and orderStatus = '已到诊'
+    </select>
+    <select id="findVisitsCountAfterDate" resultType="java.lang.Integer">
+        select count(id) from t_order where orderDate &gt;= #{orderDate} and orderStatus = '已到诊'
+    </select>
+    <select id="findHotSetmeal" resultType="java.util.Map">
+        select s.name,count(o.id) setmeal_count, count(o.id)/(select count(id) from t_order) proportion from t_order o, t_setmeal s
+        where o.setmeal_id = s.id group by o.setmeal_id order by setmeal_count desc limit 0,4;
+    </select>
+</mapper>

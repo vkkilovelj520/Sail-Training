@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.UserCheckGroupDao">
+    <resultMap id="baseResultMap" type="com.itheima.pojo.CheckGroup">
+        <id column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+    </resultMap>
+
+    <resultMap id="findByIdResultMap" type="com.itheima.pojo.CheckGroup" extends="baseResultMap">
+        <!--检查项和检查组多对多映射-->
+        <collection property="checkItems"
+                    ofType="com.itheima.pojo.CheckItem"
+                    column="id"
+                    select="com.itheima.dao.UserCheckItemDao.findCheckItemById">
+        </collection>
+    </resultMap>
+
+    <!--根据套餐id查询关联的检查组详情-->
+    <select id="findCheckGroupById" parameterType="int" resultMap="findByIdResultMap">
+        SELECT * FROM t_checkgroup WHERE id IN (SELECT checkgroup_id FROM t_setmeal_checkgroup WHERE setmeal_id = #{id})
+    </select>
+</mapper>

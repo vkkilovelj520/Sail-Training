@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.UserCheckItemDao">
+    <!--根据检查组id查询关联的检查项详情-->
+    <select id="findCheckItemById" parameterType="int" resultType="com.itheima.pojo.CheckItem">
+        SELECT * FROM t_checkitem WHERE id IN (SELECT checkitem_id FROM t_checkgroup_checkitem WHERE checkgroup_id = #{id})
+    </select>
+</mapper>
